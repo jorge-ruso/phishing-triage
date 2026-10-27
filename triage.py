@@ -1,0 +1,25 @@
+import sys
+from email import policy
+from email.parser import BytesParser
+
+def load_email(path):
+    with open(path, "rb") as f:
+        return BytesParser(policy=policy.default).parse(f)
+
+def parse_headers(msg):
+    return {
+        "from": msg.get("From"),
+        "reply_to": msg.get("Reply-To"),
+        "return_path": msg.get("Return-Path"),
+        "subject": msg.get("Subject"),
+        "date": msg.get("Date"),
+        "received": msg.get_all("Received", []),
+    }
+
+if __name__ == "__main__":
+    msg = load_email(sys.argv[1])
+    h = parse_headers(msg)
+    for k, v in h.items():
+        if k != "received":
+            print(f"{k}: {v}")
+    print(f"\nSaltos de servidor: {len(h['received'])}")
