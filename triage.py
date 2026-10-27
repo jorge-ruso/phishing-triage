@@ -31,8 +31,8 @@ if __name__ == "__main__":
     for k, v in h.items():
         if k != "received":
             print(f"{k}: {v}")
-    print(f"\nSaltos de servidor: {len(h['received'])}")
-    print("\n--- Autenticación ---")
+    print(f"\nServer hops: {len(h['received'])}")
+    print("\n--- Authentication ---")
     auth = check_auth(msg)
     for k, v in auth.items():
         print(f"{k}: {v}")
