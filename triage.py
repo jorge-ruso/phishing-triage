@@ -1,4 +1,5 @@
 import sys
+import re
 from email import policy
 from email.parser import BytesParser
 
@@ -16,6 +17,14 @@ def parse_headers(msg):
         "received": msg.get_all("Received", []),
     }
 
+def check_auth(msg):
+    auth = msg.get("Authentication-Results", "")
+    results = {}
+    for check in ["spf", "dkim", "dmarc"]:
+        match = re.search(rf"{check}=(\w+)", auth)
+        results[check] = match.group(1) if match else "none"
+    return results
+
 if __name__ == "__main__":
     msg = load_email(sys.argv[1])
     h = parse_headers(msg)
@@ -23,3 +32,7 @@ if __name__ == "__main__":
         if k != "received":
             print(f"{k}: {v}")
     print(f"\nSaltos de servidor: {len(h['received'])}")
+    print("\n--- Autenticación ---")
+    auth = check_auth(msg)
+    for k, v in auth.items():
+        print(f"{k}: {v}")
